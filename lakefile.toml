@@ -1,7 +1,7 @@
 name = "LearnLean"
 version = "0.1.0"
 keywords = ["math"]
-defaultTargets = ["LearnLean"]
+defaultTargets = ["LeanViz"]
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
@@ -21,4 +21,4 @@ name = "scilean"
 git = "https://github.com/lecopivo/SciLean"
 
 [[lean_lib]]
-name = "LearnLean"
+name = "LeanViz"
