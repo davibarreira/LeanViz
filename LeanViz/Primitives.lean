@@ -8,8 +8,6 @@ set_default_scalar Float
 class PrimInterface (α : Type) where
   draw : α → (fr : ProofWidgets.Svg.Frame) → ProofWidgets.Svg.Element fr
 
-
-
 structure Circle where
   r : Float
   c : Float^[2]
@@ -76,7 +74,7 @@ instance : ToString Prim where
 def prim {α : Type} [PrimInterface α] [ToString α] (a : α) : Prim := Prim.mk a
 #eval prim Line.o
 
-def fooo : List Prim := [⟨Circle.o⟩, ⟨Line.o⟩]
+def fooo : Array Prim := #[⟨Circle.o⟩, ⟨Line.o⟩]
 
 -- def foo : List Prim := [prim Circle.o, prim Line.o]
 def foo : Array Prim := #[prim Circle.o, prim Line.o]
@@ -85,6 +83,34 @@ open ProofWidgets Svg in
 private def svg : Svg frame :=
   { elements := Array.map (λx => Prim.draw x frame) foo}
 
+def drawsvg (a : Array Prim) (fr : Frame) : ProofWidgets.Html :=
+  let svg : ProofWidgets.Svg frame := { elements := Array.map (λx => Prim.draw x frame) a}
+  svg.toHtml
+
 #html svg.toHtml
+#check svg.toHtml
 
 -- #check Array.map prim #[prim Circle.o, prim Line.o]
+
+-- def Prim.comp {α β : Type} [PrimInterface α] [PrimInterface β] [ToString α] [ToString β] (p1 : α) (p2 : β) : Array Prim :=
+--   #[prim p1, prim p2]
+
+instance  {α β : Type} [PrimInterface α] [PrimInterface β] [ToString α] [ToString β] : HAdd  α β (Array Prim) where
+  hAdd p1 p2 := #[prim p1, prim p2]
+instance  {α : Type} [PrimInterface α] [ToString α] : HAdd  α (Array Prim) (Array Prim) where
+  hAdd p a := #[prim p] ++ a
+instance  {α : Type} [PrimInterface α] [ToString α] : HAdd  (Array Prim) α (Array Prim) where
+  hAdd a p := a ++ #[prim p]
+instance  : HAdd  Prim Prim (Array Prim) where
+  hAdd p1 p2 := #[p1, p2]
+instance  : HAdd  Prim (Array Prim) (Array Prim) where
+  hAdd p1 p2 := #[p1] ++ p2
+instance  : HAdd  (Array Prim) Prim (Array Prim) where
+  hAdd p1 p2 := p1 ++ #[p2]
+instance  : HAdd  (Array Prim) (Array Prim) (Array Prim) where
+  hAdd p1 p2 := p1 ++ p2
+
+-- infixr:80 " ++ " => Prim.comp
+
+#eval Circle.o + Circle.o + Line.o
+#html drawsvg (Circle.o + Circle.o + Line.o) frame
