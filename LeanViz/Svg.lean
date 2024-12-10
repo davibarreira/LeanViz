@@ -21,3 +21,8 @@ private def svg : Svg frame :=
 
 -- #eval toJson svg.toHtml
 #html svg.toHtml
+
+-- def x := line (0.,0.) (1.,0.) |>.setStroke (1.,0.,0.) (.px 2)
+def x := @line frame (0.,0.) (1.,0.)
+def v := fun fr : Frame => @line fr (0.,0.) (1.,0.)
+#check line
