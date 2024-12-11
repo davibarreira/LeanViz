@@ -43,7 +43,7 @@ private def frame : Frame where
   xSize  := 4
   width  := 400
   height := 400
-def x := @ProofWidgets.Svg.line frame (0.,0.) (1.,0.)
+private def x := @ProofWidgets.Svg.line frame (0.,0.) (1.,0.)
 
 
 
@@ -93,25 +93,31 @@ def drawsvg (a : Array Prim) (fr : Frame := frame) : ProofWidgets.Html :=
 -- def Prim.comp {α β : Type} [PrimInterface α] [PrimInterface β] [ToString α] [ToString β] (p1 : α) (p2 : β) : Array Prim :=
 --   #[prim p1, prim p2]
 
-instance  {α β : Type} [PrimInterface α] [PrimInterface β] [ToString α] [ToString β] : HAdd  α β (Array Prim) where
-  hAdd p1 p2 := #[prim p1, prim p2]
-instance  {α : Type} [PrimInterface α] [ToString α] : HAdd  α (Array Prim) (Array Prim) where
-  hAdd p a := #[prim p] ++ a
-instance  {α : Type} [PrimInterface α] [ToString α] : HAdd  (Array Prim) α (Array Prim) where
-  hAdd a p := a ++ #[prim p]
-instance  : HAdd  Prim Prim (Array Prim) where
-  hAdd p1 p2 := #[p1, p2]
-instance  : HAdd  Prim (Array Prim) (Array Prim) where
-  hAdd p1 p2 := #[p1] ++ p2
-instance  : HAdd  (Array Prim) Prim (Array Prim) where
-  hAdd p1 p2 := p1 ++ #[p2]
-instance  : HAdd  (Array Prim) (Array Prim) (Array Prim) where
-  hAdd p1 p2 := p1 ++ p2
+class HPlus (α : Type u) (β : Type v) where
+  hPlus : α → β → Array Prim
 
--- infixr:80 " ++ " => Prim.comp
+instance  {α β : Type} [PrimInterface α] [PrimInterface β] [ToString α] [ToString β] : HPlus  α β where
+  hPlus p1 p2 := #[prim p1, prim p2]
+instance  {α : Type} [PrimInterface α] [ToString α] : HPlus  α (Array Prim) where
+  hPlus p a := #[prim p] ++ a
+instance  {α : Type} [PrimInterface α] [ToString α] : HPlus  (Array Prim) α where
+  hPlus a p := a ++ #[prim p]
+instance : HPlus  Prim Prim where
+  hPlus p1 p2 := #[p1, p2]
+instance  : HPlus  Prim (Array Prim) where
+  hPlus p1 p2 := #[p1] ++ p2
+instance  : HPlus  (Array Prim) Prim where
+  hPlus p1 p2 := p1 ++ #[p2]
+instance  : HPlus  (Array Prim) (Array Prim) where
+  hPlus p1 p2 := p1 ++ p2
 
-#eval Circle.o + Circle.o + Line.o
-#html drawsvg (Circle.o + (Circle.mk 0.5 ⊞[0,1]) + Line.o)
+infixr:80 " ⊕ " => HPlus.hPlus
+
+-- #ev(us Circle⊕ .o Circl : Array Prim)e.o
+#eval Circle.o ⊕ Circle.o
+
+#eval Circle.o ⊕ Circle.o ⊕ Line.o
+#html drawsvg (Circle.o ⊕ (Circle.mk 0.5 ⊞[0,1]) ⊕ Line.o)
 
 open ProofWidgets Svg in
 private def frame2 : Frame where
@@ -120,8 +126,10 @@ private def frame2 : Frame where
   xSize  := 10
   width  := 400
   height := 400
-#html drawsvg (Circle.o + (Circle.mk 0.5 ⊞[1,1]) + Line.o) frame2
-def eyes := (Circle.mk 0.3 ⊞[-0.8,1]) + (Circle.mk 0.3 ⊞[0.8,1])
-#html drawsvg (Circle.mk 2.0 ⊞[0,0] + eyes + Line.mk (⊞[-1,-0.5], ⊞[1,-0.5])) frame2
+#html drawsvg (Circle.o ⊕ (Circle.mk 0.5 ⊞[1,1]) ⊕ Line.o) frame2
+def eyes := (Circle.mk 0.3 ⊞[-0.8,1]) ⊕ (Circle.mk 0.3 ⊞[0.8,1])
+#html drawsvg (Circle.mk 2.0 ⊞[0,0] ⊕ eyes ⊕ Line.mk (⊞[-1,-0.5], ⊞[1,-0.5])) frame2
+
+#eval (#[] : Array Prim)
 
 end Primitives

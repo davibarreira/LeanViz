@@ -52,7 +52,7 @@ instance : Monad 𝕋 where
   pure := η
   bind := freebind
 
-def y := 𝕋.comp (𝕋.pure 1) (𝕋.comp (𝕋.pure 2) (𝕋.pure 10))
+private def y := 𝕋.comp (𝕋.pure 1) (𝕋.comp (𝕋.pure 2) (𝕋.pure 10))
 #eval y
 #eval (fun x : Nat => 2 * x) <$> y
 #eval toString <$> y
@@ -66,10 +66,10 @@ def alg : 𝕋 Float → Float
   | 𝕋.comp x y => (alg x) + (alg y)
   | 𝕋.act h x => h.g * (alg x)
 
-def z := 𝕋.comp (𝕋.pure 1.0) (𝕋.comp (𝕋.pure 2) (𝕋.pure 10))
+private def z := 𝕋.comp (𝕋.pure 1.0) (𝕋.comp (𝕋.pure 2) (𝕋.pure 10))
 #eval alg z
 
-def w := 𝕋.act (H.mk 2.5) (𝕋.comp (𝕋.pure 2) (𝕋.pure 10))
+private def w := 𝕋.act (H.mk 2.5) (𝕋.comp (𝕋.pure 2) (𝕋.pure 10))
 #eval alg (Nat.toFloat <$> w)
 
 end FreeMonad
