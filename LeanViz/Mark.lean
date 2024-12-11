@@ -118,6 +118,8 @@ instance  {β : Type} [MarkInterface β] [PrimInterface β] [ToString β] : HAdd
 #html Mark.draw (x+z) frame2
 #html Mark.draw ((Circle.mk 2.0 ⊞[3,0]) + x) frame2
 #html Mark.draw ((x + Circle.mk 2.0 ⊞[3,0]) + Line.o) frame2
+#html Mark.draw ((x + Circle.mk 2.0 ⊞[3,0]) + Line.o)
+
 -- instance  {α : Type} [PrimInterface α] [ToString α] : HAdd  α (Array Prim) (Array Prim) where
 --   hAdd p a := #[prim p] ++ a
 -- instance  {α : Type} [PrimInterface α] [ToString α] : HAdd  (Array Prim) α (Array Prim) where
