@@ -1,5 +1,6 @@
 set_option autoImplicit true
 
+namespace FreeMonad
 structure H where
   g : Float
 deriving Repr, BEq
@@ -19,7 +20,7 @@ instance : Functor F where
 instance : Mul H where
   mul x y := H.mk (x.g * y.g)
 
-inductive 𝕋 (α : Type) where
+inductive 𝕋 (α : Type u) where
   | pure : α → 𝕋 α
   | comp : 𝕋 α → 𝕋 α → 𝕋 α
   | act : H → 𝕋 α → 𝕋 α
@@ -70,3 +71,5 @@ def z := 𝕋.comp (𝕋.pure 1.0) (𝕋.comp (𝕋.pure 2) (𝕋.pure 10))
 
 def w := 𝕋.act (H.mk 2.5) (𝕋.comp (𝕋.pure 2) (𝕋.pure 10))
 #eval alg (Nat.toFloat <$> w)
+
+end FreeMonad
