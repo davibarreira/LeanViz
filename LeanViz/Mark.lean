@@ -29,19 +29,14 @@ structure Head where
 deriving Repr
 instance : ToString Head where
   toString h := "Head (size: " ++ toString h.size ++ ", smile: " ++ toString h.smile ++ ")"
-
-
 def Head.o : Head := Head.mk 1.0 0.0
 
 instance : MarkInterface Head where
   θ h :=
-  let eyes := (Circle.mk 0.3 ⊞[-0.8,1]) + (Circle.mk 0.3 ⊞[0.8,1])
-  (Circle.mk 2.0 ⊞[0,0] + eyes + Line.mk (⊞[-1,-0.5], ⊞[1,-0.5]))
-    -- let eyes := (Circle.mk 0.3 ⊞[-0.8,1]) + (Circle.mk 0.3 ⊞[0.8,1])
-    -- let smile := Line.mk (⊞[-1,-0.5], ⊞[1,-0.5])
-    -- let head := Circle.mk h.size ⊞[0,0]
-    -- eyes + smile + head
-
+    let eyes := (Circle.mk 0.3 ⊞[-0.8,1]) + (Circle.mk 0.3 ⊞[0.8,1])
+    let smile := Line.mk (⊞[-1,-0.5], ⊞[1,-0.5])
+    let head := Circle.mk (2*h.size) ⊞[0,0]
+    head + eyes + smile
 
 def algθ : 𝕋 (Array Prim) → Array Prim
   | 𝕋.pure x => x
@@ -85,3 +80,26 @@ private def frame2 : Frame where
 #html drawsvg (algθ (Mark.θ <$> x))
 #html Mark.draw y
 #html Mark.draw z
+
+
+structure Adam where
+  head : Head
+  height : Float
+instance : ToString Adam where
+  toString h := "Adam (head: " ++ toString h.head ++ ", height: " ++ toString h.height ++ ")"
+def Adam.o (head : Head := Head.o) : Adam := Adam.mk head (7 * head.size)
+
+def Adam.ζ (adam : Adam) : 𝕋 Mark :=
+  let head := adam.head
+  let body := Line.mk (⊞[0.,0.],⊞[0,-adam.height])
+  let diag : 𝕋 Mark := 𝕋.comp (𝕋.pure ⟨body⟩) (𝕋.pure ⟨head⟩)
+  diag
+instance : MarkInterface Adam where
+  θ adam := algθ (Mark.θ <$> Adam.ζ adam)
+
+
+#html Mark.draw (.pure ⟨Adam.o⟩ : 𝕋 Mark) frame2
+
+def w :𝕋 Mark  := 𝕋.comp (𝕋.pure ⟨Adam.o⟩) (𝕋.comp (𝕋.pure ⟨Circle.mk 2.0 ⊞[2,1]⟩) (𝕋.pure ⟨Adam.o⟩))
+
+#html Mark.draw w frame2
