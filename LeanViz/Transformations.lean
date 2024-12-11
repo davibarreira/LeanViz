@@ -12,10 +12,9 @@ def vecnorm (v : Float^[n]) : Float :=
   (v.foldl (λ acc x => acc + x*x) 0.0).sqrt
 
 instance : HMul Float (Float^[2]) (Float^[2]) where
-  hMul x y := ⊞[x * y[1], x * y[2]]
+  hMul x y := ⊞[x * y[0], x * y[1]]
 instance : HMul (Float^[2]) Float (Float^[2]) where
-  hMul y x := ⊞[x * y[1], x * y[2]]
-
+  hMul y x := ⊞[x * y[0], x * y[1]]
 structure G (n : ℕ) where
   A : Float^[n,n]
   b : Float^[n]
@@ -70,9 +69,7 @@ def S : G 2 :=
 #eval T ∘ T ∘ T * examplePoint
 
 
-#eval norm examplePoint
+#eval vecnorm examplePoint
 #eval examplePoint[2]
-
-
 
 end G
