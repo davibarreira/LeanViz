@@ -15,6 +15,9 @@ instance : HMul Float (Float^[2]) (Float^[2]) where
   hMul x y := ⊞[x * y[0], x * y[1]]
 instance : HMul (Float^[2]) Float (Float^[2]) where
   hMul y x := ⊞[x * y[0], x * y[1]]
+
+
+
 structure G (n : ℕ) where
   A : Float^[n,n]
   b : Float^[n]
@@ -22,6 +25,7 @@ structure G (n : ℕ) where
 def G.eval (f : G n) (x : Float^[n]) := f.A * x + f.b
 def G.comp (f g : G n) : G n :=
   { A := f.A * g.A, b := f.A * g.b + f.b }
+
 instance : HMul (G n) (Float^[n]) (Float^[n]) where
   hMul := G.eval
 
@@ -52,13 +56,19 @@ private def examplePoint : Float^[2] := ⊞[1.0, 1.0]  -- Point [1, 1]
 #eval examplePoint
 
 def T : G 2 :=
-  G.translate ⊞[2.0, 3.0]
+  G.translate ⊞[2.0, 0.0]
 
 def R : G 2 :=
   G.rotate π
 
 def S : G 2 :=
   G.scale 2.0
+
+
+private def x : Float^[2] := ⊞[0.0, 0.0]  -- Point [1, 1]
+#eval x
+#eval G.translate ⊞[1.0,0.0] * x
+#eval (G.rotate π) * x
 
 #eval T.eval examplePoint
 #eval (T.comp T).eval examplePoint
@@ -68,8 +78,12 @@ def S : G 2 :=
 #eval (T ∘ T ∘ T) * examplePoint
 #eval T ∘ T ∘ T * examplePoint
 
+#eval (T ∘ T) * x
+
 
 #eval vecnorm examplePoint
 #eval examplePoint[2]
+
+#check G.translate ⊞[1,0]
 
 end G

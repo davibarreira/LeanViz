@@ -9,6 +9,8 @@ set_option autoImplicit true
 set_default_scalar Float
 
 open G
+namespace GeometricPrimitive
+
 inductive Geom where
   | line     (src trg : Float^[2])
   | circle   (r : Float) (c : Float^[2])
@@ -85,3 +87,5 @@ private def get : CovGeom → Float^[2]
 #eval ψ (G.translate ⊞[1.0,0] * (ϕ circle))
 
 #eval ψ (ϕ circle)
+
+end GeometricPrimitive
