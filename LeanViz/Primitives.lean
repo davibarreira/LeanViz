@@ -5,6 +5,8 @@ import ProofWidgets.Component.HtmlDisplay
 set_option autoImplicit true
 set_default_scalar Float
 
+namespace Primitives
+
 class PrimInterface (α : Type) where
   draw : α → (fr : ProofWidgets.Svg.Frame) → ProofWidgets.Svg.Element fr
 
@@ -17,7 +19,7 @@ def Circle.o : Circle := Circle.mk 1 ⊞[0,0]
 
 open ProofWidgets Svg in
 def drawCircle (c : Circle) (fr : Frame) : Element fr :=
-  circle (c.c[1],c.c[2]) (.abs c.r) |>.setStroke (0.,0.,0.) (.px 2) |>.setFill (0.,1.,1.) |>.setId "point1"
+  circle (c.c[2],c.c[1]) (.abs c.r) |>.setStroke (0.,0.,0.) (.px 2) |>.setFill (0.,1.,1.) |>.setId "point1"
 #eval Circle.o
 instance : PrimInterface Circle where
   draw := drawCircle
@@ -29,7 +31,7 @@ instance : ToString Line where
 def Line.o : Line := Line.mk (⊞[0,0], ⊞[1,1])
 open ProofWidgets Svg in
 def drawLine (l : Line) (fr : Frame) : Element fr :=
-  line (l.pts.fst[1],l.pts.fst[2]) (l.pts.snd[1],l.pts.snd[2]) |>.setStroke (1.,0.,0.) (.px 2)
+  line (l.pts.fst[2],l.pts.fst[1]) (l.pts.snd[2],l.pts.snd[1]) |>.setStroke (1.,0.,0.) (.px 2)
 #eval Line.o
 instance : PrimInterface Line where
   draw := drawLine
@@ -53,17 +55,12 @@ def d := PrimInterface.draw Circle.o frame
 #check d
 #html d.toHtml
 
-  -- @ProofWidgets.Svg.line fr (0.,0.) (1.,0.)
---   open ProofWidgets Svg in
---   fun fr : Frame => @line fr (0.,0.) (1.,0.)
-
 structure Prim where
   {T : Type}
   [inst : PrimInterface T]
   [strg : ToString T]
   val : T
 
--- def Prim.draw : Prim → Int := fun p => p.inst.fm m.val
 def Prim.draw (p : Prim) (fr : ProofWidgets.Svg.Frame) : ProofWidgets.Svg.Element fr :=
   p.inst.draw p.val fr
 
@@ -83,8 +80,9 @@ open ProofWidgets Svg in
 private def svg : Svg frame :=
   { elements := Array.map (λx => Prim.draw x frame) foo}
 
-def drawsvg (a : Array Prim) (fr : Frame) : ProofWidgets.Html :=
-  let svg : ProofWidgets.Svg frame := { elements := Array.map (λx => Prim.draw x frame) a}
+open ProofWidgets Svg in
+def drawsvg (a : Array Prim) (fr : Frame := frame) : ProofWidgets.Html :=
+  let svg : ProofWidgets.Svg fr := { elements := Array.map (λx => Prim.draw x fr) a}
   svg.toHtml
 
 #html svg.toHtml
@@ -113,4 +111,17 @@ instance  : HAdd  (Array Prim) (Array Prim) (Array Prim) where
 -- infixr:80 " ++ " => Prim.comp
 
 #eval Circle.o + Circle.o + Line.o
-#html drawsvg (Circle.o + Circle.o + Line.o) frame
+#html drawsvg (Circle.o + (Circle.mk 0.5 ⊞[0,1]) + Line.o)
+
+open ProofWidgets Svg in
+private def frame2 : Frame where
+  xmin   := -5
+  ymin   := -5
+  xSize  := 10
+  width  := 400
+  height := 400
+#html drawsvg (Circle.o + (Circle.mk 0.5 ⊞[1,1]) + Line.o) frame2
+def eyes := (Circle.mk 0.3 ⊞[-0.8,1]) + (Circle.mk 0.3 ⊞[0.8,1])
+#html drawsvg (Circle.mk 2.0 ⊞[0,0] + eyes + Line.mk (⊞[-1,-0.5], ⊞[1,-0.5])) frame2
+
+end Primitives
