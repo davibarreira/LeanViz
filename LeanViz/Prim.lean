@@ -2,7 +2,6 @@ import SciLean
 import LeanViz.Style
 import LeanViz.Geom
 import LeanViz.Transformations
--- import LeanViz.Geom
 
 import ProofWidgets.Data.Svg
 import ProofWidgets.Component.HtmlDisplay
@@ -10,7 +9,7 @@ import ProofWidgets.Component.HtmlDisplay
 set_option autoImplicit true
 set_default_scalar Float
 
-open Sty GeometricPrimitive G
+open Sty GeometricPrimitive GeometricTransformation
 open ProofWidgets Svg
 
 namespace GraphicalPrimitive
@@ -28,12 +27,12 @@ structure Prim where
 deriving Repr
 
 structure H where
-  g : G 2
+  g : G
   s : Style
 instance : Repr H where
     reprPrec h _ := "{ g:= G, s := " ++ repr h.s ++ " }"
 
-instance : HMul (G 2) Prim Prim where
+instance : HMul G Prim Prim where
   hMul g p := {p with geom := g * p.geom}
 
 instance : HMul Style Prim Prim where
@@ -54,12 +53,19 @@ def geomToShape (g : Geom) (fr : Frame) : Shape fr :=
   | Geom.polygon points => Shape.polygon (points.map fun p => vecToPoint p fr)
 
 def primToElem (p : Prim) (fr : Frame) : Element fr :=
-  let shape : Element fr := {shape := geomToShape p.geom fr, fillColor := p.s.fillColor, strokeColor := p.s.strokeColor, strokeWidth := styleToSize p.s.strokeWidth fr}
-  shape
+  { shape := geomToShape p.geom fr
+  , fillColor := p.s.fillColor
+  , strokeColor := p.s.strokeColor
+  , strokeWidth := styleToSize p.s.strokeWidth fr
+  }
 
 def drawsvg (a : Array Prim) (fr : Frame := frame) : ProofWidgets.Html :=
   let svg : ProofWidgets.Svg fr := { elements := Array.map (λx => primToElem x fr) a}
   svg.toHtml
+def line (src : Float^[2] := ⊞[0.0,0.0]) (tgt : Float^[2] := ⊞[1.0,1.0]) :=   Geom.line src tgt
+def circle (r : Float := 1.0) (c : Float^[2] := ⊞[0.0,0.0]) := Geom.circle r c
+def polyline (points : Array (Float^[2]) := #[⊞[-1.0,0.0],⊞[0.5,0.5], ⊞[1.0,0.0]]) := Geom.polyline points
+def polygon (points : Array (Float^[2]) := #[⊞[-0.5,-0.5],⊞[0.5,-0.5], ⊞[0.5,0.5],⊞[-0.5,0.5]]) := Geom.polygon points
 
 private def x : Prim := {geom := circle, s := {fillColor := Color.mk 1 1 0}}
 

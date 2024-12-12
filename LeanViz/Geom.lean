@@ -8,7 +8,7 @@ open SciLean Scalar RealScalar
 set_option autoImplicit true
 set_default_scalar Float
 
-open G
+open GeometricTransformation
 namespace GeometricPrimitive
 
 inductive Geom where
@@ -49,14 +49,14 @@ def ψ : CovGeom → Geom
   | .polyline points => .polyline points
   | .polygon points => .polygon points
 
-instance : HMul (G 2) CovGeom CovGeom where
+instance : HMul G CovGeom CovGeom where
   hMul g p := match p with
     | .line src tgt => .line (g*src) (g*tgt)
     | .circle p1 p2 => .circle (g*p1) (g*p2)
     | .polyline points => .polyline (Array.map (g * ·) points)
     | .polygon points => .polygon (Array.map (g * ·) points)
 
-instance : HMul (G 2) Geom Geom where
+instance : HMul G Geom Geom where
   hMul g p := ψ (g * (ϕ p))
 
 def line (src : Float^[2] := ⊞[0.0,0.0]) (tgt : Float^[2] := ⊞[1.0,1.0]) := Geom.line src tgt

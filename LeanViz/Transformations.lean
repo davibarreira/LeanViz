@@ -5,7 +5,7 @@ open SciLean Scalar RealScalar
 set_option autoImplicit true
 set_default_scalar Float
 
-namespace G
+namespace GeometricTransformation
 
 -- Auxiliar function for Vector Norm
 def vecnorm (v : Float^[n]) : Float :=
@@ -17,36 +17,35 @@ instance : HMul (Float^[2]) Float (Float^[2]) where
   hMul y x := ⊞[x * y[0], x * y[1]]
 
 
+structure G where
+  A : Float^[2,2]
+  b : Float^[2]
 
-structure G (n : ℕ) where
-  A : Float^[n,n]
-  b : Float^[n]
-
-def G.eval (f : G n) (x : Float^[n]) := f.A * x + f.b
-def G.comp (f g : G n) : G n :=
+def G.eval (f : G) (x : Float^[2]) := f.A * x + f.b
+def G.comp (f g : G) : G :=
   { A := f.A * g.A, b := f.A * g.b + f.b }
 
-instance : HMul (G n) (Float^[n]) (Float^[n]) where
+instance : HMul (G) (Float^[2]) (Float^[2]) where
   hMul := G.eval
 
-instance : HMul (G n) (G n) (G n) where
+instance : HMul (G) (G) (G) where
   hMul := G.comp
 
 infixr:80 " ∘ " => G.comp
 
-def G.translate (t : Float^[2]) : G 2 :=
+def G.translate (t : Float^[2]) : G :=
 {
   A := 𝐈 2
   b := t
 }
 
-def G.rotate (θ : Float) : G 2 :=
+def G.rotate (θ : Float) : G :=
 {
   A := ⊞[cos θ, -sin θ;sin θ, cos θ]
   b := 0
 }
 
-def G.scale (s : Float) : G 2 :=
+def G.scale (s : Float) : G :=
 {
   A := s • 𝐈 2
   b := 0
@@ -55,13 +54,13 @@ def G.scale (s : Float) : G 2 :=
 private def examplePoint : Float^[2] := ⊞[1.0, 1.0]  -- Point [1, 1]
 #eval examplePoint
 
-def T : G 2 :=
+def T : G :=
   G.translate ⊞[2.0, 0.0]
 
-def R : G 2 :=
+def R : G :=
   G.rotate π
 
-def S : G 2 :=
+def S : G :=
   G.scale 2.0
 
 
@@ -86,4 +85,4 @@ private def x : Float^[2] := ⊞[0.0, 0.0]  -- Point [1, 1]
 
 #check G.translate ⊞[1,0]
 
-end G
+end GeometricTransformation
